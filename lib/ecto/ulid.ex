@@ -3,7 +3,7 @@ defmodule Ecto.ULID do
   An Ecto type for ULID strings.
   """
 
-  @behaviour Ecto.Type
+  use Ecto.Type
 
   def timestamp(<<_::bytes-size(26)>> = encoded) do
     with {:ok, decoded} <- decode(encoded) do
