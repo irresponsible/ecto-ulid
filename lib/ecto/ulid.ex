@@ -5,14 +5,25 @@ defmodule Ecto.ULID do
 
   @behaviour Ecto.Type
 
+  def timestamp(<<_::bytes-size(26)>> = encoded) do
+    with {:ok, decoded} <- decode(encoded) do
+      bintimestamp(decoded)
+    end
+  end
+
+  def bintimestamp(<<timestamp::unsigned-size(48), _ :: binary>>) do
+    DateTime.from_unix(timestamp, :millisecond)
+  end
+
   @doc """
   The underlying schema type.
   """
   def type, do: :uuid
 
   @doc """
-  Casts a string to ULID.
+  Casts a 26-byte encoded string to ULID or a 16-byte binary unchanged
   """
+  def cast(<<_::bytes-size(16)>> = value), do: {:ok, value}
   def cast(<<_::bytes-size(26)>> = value) do
     if valid?(value) do
       {:ok, value}
